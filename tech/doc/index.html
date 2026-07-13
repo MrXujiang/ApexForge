@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ApexForge 开发者文档 · 项目总览</title>
+  <meta name="description" content="ApexForge AI CAD / AI 3D 参数化建模平台开发者文档总览。" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="doc-shell">
+    <header class="topbar">
+      <a class="brand" href="./index.html" aria-label="ApexForge 文档首页">
+        <span class="brand-mark">AF</span>
+        <span>ApexForge Docs</span>
+      </a>
+      <nav class="nav-links" aria-label="文档导航">
+        <a class="active" href="./index.html">总览</a>
+        <a href="./architecture.html">架构设计</a>
+        <a href="./generation-flow.html">AI 生成链路</a>
+        <a href="./frontend.html">前端实现</a>
+        <a href="./backend.html">后端实现</a>
+        <a href="./rendering.html">3D 渲染</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">AI CAD · Three.js · NestJS · 多模型供应商</div>
+        <h1>让开发者快速读懂 ApexForge 的 AI 3D 建模系统</h1>
+        <p class="lead">ApexForge 是一个面向自然语言建模、参数化 3D 预览、模型导入与可视化调参的 AI CAD 平台。本套文档从产品目标、系统架构、AI 生成链路、前后端实现到 Three.js 渲染策略，完整说明当前项目的核心实现方式。</p>
+        <div class="tag-row">
+          <span class="tag">React 18</span>
+          <span class="tag">TypeScript</span>
+          <span class="tag">Three.js</span>
+          <span class="tag">NestJS</span>
+          <span class="tag">Prisma</span>
+          <span class="tag">DeepSeek / Kimi / Qwen</span>
+        </div>
+      </div>
+      <aside class="hero-card">
+        <div class="hero-visual" aria-label="ApexForge 3D 收音机模型示意图">
+          <div class="model-handle"></div>
+          <div class="radio-model"></div>
+          <div class="grid-floor"></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="stat-grid" aria-label="项目能力指标">
+      <div class="metric"><strong>3D 建模工作台</strong><span>左侧输入、中央预览、右侧参数编辑的一屏式 Studio</span></div>
+      <div class="metric"><strong>多模型接入</strong><span>支持 DeepSeek、Kimi、千问，在线 API Key 优先</span></div>
+      <div class="metric"><strong>开放品类生成</strong><span>覆盖车辆、手表、镜子、飞机、耳机、收音机等品类</span></div>
+      <div class="metric"><strong>导入与贴图</strong><span>支持 GLB、GLTF、OBJ、STL 与图片纹理上传</span></div>
+    </section>
+
+    <section class="section">
+      <h2>文档地图</h2>
+      <div class="card-grid">
+        <a class="card" href="./architecture.html">
+          <h3>架构设计</h3>
+          <p>查看前端、后端、AI 服务、数据库、3D 渲染的分层架构，以及关键模块之间的协作关系。</p>
+        </a>
+        <a class="card" href="./generation-flow.html">
+          <h3>AI 生成链路</h3>
+          <p>理解从用户 Prompt 到 LLM 意图解析、Harness 多 Agent 编排、参数合成和模型预览的完整流程。</p>
+        </a>
+        <a class="card" href="./frontend.html">
+          <h3>前端实现</h3>
+          <p>拆解 StudioPage、PromptInput、PropertyInspectorPanel、ModelViewer 等核心组件职责。</p>
+        </a>
+        <a class="card" href="./backend.html">
+          <h3>后端实现</h3>
+          <p>说明 NestJS 模块、GenerationService、LlmService、ValidationService、TemplatesService 与 Prisma 数据模型。</p>
+        </a>
+        <a class="card" href="./rendering.html">
+          <h3>3D 渲染方案</h3>
+          <p>深入 Three.js 场景、参数化模型工厂、材质系统、归一化、导入模型加载与圆柱噪声优化。</p>
+        </a>
+        <a class="card" href="https://github.com/MrXujiang/ApexForge" target="_blank" rel="noreferrer">
+          <h3>项目仓库</h3>
+          <p>访问 GitHub 仓库，结合源码继续学习和二次开发。</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="section two-col">
+      <div class="panel">
+        <h2>核心定位</h2>
+        <p>ApexForge 当前的核心不是简单的模型展示器，而是一个完整的 AI 建模体验闭环：自然语言输入、模型供应商选择、在线 Key 配置、后端意图解析、参数化生成、前端三维渲染、可视化属性编辑、导入模型覆盖和历史记录。</p>
+      </div>
+      <div class="diagram">
+        <div class="flow-row" aria-label="产品闭环流程图">
+          <div class="flow-node"><div class="node-title">Prompt</div><p>用户描述目标模型、风格、材质和细节</p></div>
+          <div class="flow-node"><div class="node-title">AI Intent</div><p>LLM 输出结构化建模参数</p></div>
+          <div class="flow-node"><div class="node-title">Parametric Model</div><p>Three.js 工厂生成可编辑模型</p></div>
+          <div class="flow-node"><div class="node-title">Studio</div><p>预览、调参、导入、贴图、历史沉淀</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>开发者应该先理解的五件事</h2>
+      <div class="timeline">
+        <div class="timeline-item"><h3>Studio 是体验入口</h3><p>所有核心状态集中在 StudioPage：当前 Prompt、生成结果、Viewer 参数、在线 API Key、历史记录、顶部导航和联系作者弹窗。</p></div>
+        <div class="timeline-item"><h3>后端负责把 Prompt 变成参数</h3><p>GenerationService 调度 LlmService 与 Harness，产出 ModelGenerationParams、Agent 执行信息、技能链和质量评分。</p></div>
+        <div class="timeline-item"><h3>Three.js 负责最终可视化</h3><p>ModelViewer 初始化场景、光照、控制器，并根据参数调用 modelFactory 或加载导入资产。</p></div>
+        <div class="timeline-item"><h3>在线 API Key 不写入源码</h3><p>前端使用 localStorage 保存当前浏览器的供应商 Key，生成时传给后端；后端优先使用在线 Key，未填写才回退环境变量。</p></div>
+        <div class="timeline-item"><h3>默认模型是精致收音机</h3><p>为了提升初始观感，product 默认分支会生成更完整的复古收音机，但开放品类仍通过关键词进入各自专属模型分支。</p></div>
+      </div>
+    </section>
+
+    <section class="section callout">
+      <strong>安全说明：</strong>
+      <p>本文档只说明环境变量名称与配置方式，不包含任何真实 API Key。开发和部署时请通过浏览器在线配置或服务端环境变量注入密钥。</p>
+    </section>
+
+    <footer class="footer">ApexForge Developer Documentation · 生成于 tech/doc · 面向源码阅读、二次开发与架构学习。</footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Template {
+  id            String            @id
+  name          String
+  category      String
+  description   String
+  tags          String
+  defaultPrompt String
+  complexity    String
+  status        String            @default("published")
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  generations   GenerationTask[]
+}
+
+model GenerationTask {
+  id                 String             @id
+  traceId            String             @unique
+  prompt             String
+  normalizedPrompt   String
+  category           String
+  mode               String             @default("template")
+  status             String
+  templateId         String?
+  generatedCode      String?
+  generatedParams    String?
+  explanation        String?
+  metrics            String
+  validationReportId String?
+  qualityScoreId     String?
+  errorCode          String?
+  errorMessage       String?
+  startedAt          DateTime?
+  completedAt        DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  template           Template?          @relation(fields: [templateId], references: [id])
+  validationReport   ValidationReport?
+  qualityScore       QualityScore?
+  assetVersions      ModelVersion[]
+  feedback           Feedback[]
+
+  @@index([category])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ValidationReport {
+  id               String         @id
+  generationTaskId String         @unique
+  passed           Boolean
+  blockedReasons   String
+  warnings         String
+  complexity       String
+  astSummary       String?
+  createdAt        DateTime       @default(now())
+  generationTask   GenerationTask @relation(fields: [generationTaskId], references: [id], onDelete: Cascade)
+}
+
+model QualityScore {
+  id                 String         @id
+  generationTaskId   String         @unique
+  totalScore         Int
+  renderabilityScore Int
+  structureScore     Int
+  promptMatchScore   Int
+  performanceScore   Int
+  details            String
+  createdAt          DateTime       @default(now())
+  generationTask     GenerationTask @relation(fields: [generationTaskId], references: [id], onDelete: Cascade)
+}
+
+model ModelAsset {
+  id               String         @id
+  name             String
+  category         String
+  prompt           String
+  thumbnailUrl     String?
+  currentVersionId String?
+  tags             String
+  status           String         @default("active")
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  versions         ModelVersion[]
+}
+
+model ModelVersion {
+  id               String         @id
+  assetId          String
+  generationTaskId String
+  versionNo        Int
+  code             String?
+  params           String?
+  modelJsonUrl     String?
+  screenshotUrl    String?
+  metrics          String
+  createdAt        DateTime       @default(now())
+  asset            ModelAsset     @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  generationTask   GenerationTask @relation(fields: [generationTaskId], references: [id])
+
+  @@index([assetId])
+}
+
+model Feedback {
+  id               String         @id
+  generationTaskId String
+  rating           String
+  comment          String?
+  createdAt        DateTime       @default(now())
+  generationTask   GenerationTask @relation(fields: [generationTaskId], references: [id], onDelete: Cascade)
+
+  @@index([generationTaskId])
+}

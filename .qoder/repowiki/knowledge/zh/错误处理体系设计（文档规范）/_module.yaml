@@ -1,0 +1,8 @@
+schema_version: 1
+module_path: error_handling
+title: 错误处理体系设计（文档规范）
+scope: []
+source_files:
+    - tech/product-technical-design.md
+depends_on: []
+related_to: []

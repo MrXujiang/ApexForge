@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ApexForge 开发者文档 · 前端实现</title>
+  <meta name="description" content="ApexForge React Studio 工作台、组件职责、状态流和交互实现说明。" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="doc-shell">
+    <header class="topbar">
+      <a class="brand" href="./index.html"><span class="brand-mark">AF</span><span>ApexForge Docs</span></a>
+      <nav class="nav-links" aria-label="文档导航">
+        <a href="./index.html">总览</a>
+        <a href="./architecture.html">架构设计</a>
+        <a href="./generation-flow.html">AI 生成链路</a>
+        <a class="active" href="./frontend.html">前端实现</a>
+        <a href="./backend.html">后端实现</a>
+        <a href="./rendering.html">3D 渲染</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">React Studio</div>
+        <h1>一屏式 AI CAD 工作台的前端实现</h1>
+        <p class="lead">前端围绕 StudioPage 展开，采用左侧输入与模型配置、中央 Three.js 预览、右侧参数与编排信息的布局。用户可以自然语言生成、在线配置模型 Key、导入 3D 文件、上传纹理并实时调参。</p>
+      </div>
+      <aside class="panel">
+        <h3>前端关键文件</h3>
+        <div class="tag-row">
+          <span class="tag">StudioPage.tsx</span>
+          <span class="tag">PromptInput.tsx</span>
+          <span class="tag">PropertyInspectorPanel.tsx</span>
+          <span class="tag">ModelViewer.tsx</span>
+          <span class="tag">generationService.ts</span>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section">
+      <h2>页面布局结构</h2>
+      <div class="diagram">
+        <div class="arch-row" aria-label="Studio 页面布局图">
+          <div class="arch-col"><div class="node-title">顶部导航</div><p>ApexForge 标识、AI 学习手册、AI 文档、GitHub、联系作者二维码弹窗。</p></div>
+          <div class="arch-col"><div class="node-title">左侧面板</div><p>Prompt、供应商选择、在线 Key、生成按钮、3D 模型导入、历史记录。</p></div>
+          <div class="arch-col"><div class="node-title">中央预览</div><p>Three.js 模型视图、网格地面、OrbitControls、导入资产预览。</p></div>
+          <div class="arch-col"><div class="node-title">右侧面板</div><p>属性编辑、生成结果、Agent 编排、技能链、质量评分。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>组件职责拆解</h2>
+      <div class="feature-grid">
+        <div class="card"><h3>StudioPage</h3><p>保存 viewerParams、selected result、isGenerating、llmProvider、llmApiKeys、history、contactOpen 等页面级状态，并协调生成请求与 UI 更新。</p></div>
+        <div class="card"><h3>PromptInput</h3><p>负责 Prompt 输入、多模型供应商选择、在线 API Key 表单和 ModelAssetUploader。导入按钮位于生成按钮下方，整行展示。</p></div>
+        <div class="card"><h3>PropertyInspectorPanel</h3><p>提供主题色、强调色、细节级别、复杂度、材质、曲线、连接、纹理上传等可视化控制项。</p></div>
+        <div class="card"><h3>ModelViewer</h3><p>根据参数渲染 AI 参数化模型，或解析 importedModelDataUrl 加载 GLB、GLTF、OBJ、STL。</p></div>
+        <div class="card"><h3>AgentOrchestrationPanel</h3><p>展示 Prompt Architect、Structure Agent、Surface Detail Agent、Material Agent、Quality Agent 的执行结果。</p></div>
+        <div class="card"><h3>GenerationPanel / HistoryList</h3><p>展示当前生成结果、评分、技能链和历史记录，帮助用户回看最近生成内容。</p></div>
+      </div>
+    </section>
+
+    <section class="section two-col">
+      <div class="panel">
+        <h2>状态流</h2>
+        <p>用户输入 Prompt 后，StudioPage 调用 createLocalGeneration。成功后把返回结果设置为 selected，并把 result.params 合并到 viewerParams；右侧属性编辑直接修改 viewerParams，因此中央 ModelViewer 会立即根据最新参数重建或更新模型。</p>
+      </div>
+      <div class="diagram">
+        <div class="flow-row" aria-label="前端状态流图">
+          <div class="flow-node"><div class="node-title">PromptInput</div><p>提交 prompt 与 provider</p></div>
+          <div class="flow-node"><div class="node-title">StudioPage</div><p>请求生成并保存状态</p></div>
+          <div class="flow-node"><div class="node-title">viewerParams</div><p>统一承载渲染参数</p></div>
+          <div class="flow-node"><div class="node-title">ModelViewer</div><p>根据参数重建模型</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>在线模型配置</h2>
+      <div class="timeline">
+        <div class="timeline-item"><h3>UI 入口</h3><p>PromptInput 的“在线模型配置”区提供 DeepSeek、Kimi、千问三个 password 输入框。</p></div>
+        <div class="timeline-item"><h3>本地保存</h3><p>StudioPage 使用 apexforge.llmApiKeys 作为 localStorage key，保存当前浏览器的配置。</p></div>
+        <div class="timeline-item"><h3>请求透传</h3><p>生成时把 llmApiKeys 传入 createLocalGeneration，后端按当前 provider 取对应 Key。</p></div>
+        <div class="timeline-item"><h3>体验兜底</h3><p>未填写在线 Key 时，后端才尝试读取环境变量；两者都缺失时返回清晰错误提示。</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>模型导入与图片贴图</h2>
+      <div class="feature-grid">
+        <div class="card"><h3>3D 模型导入</h3><p>ModelAssetUploader 使用 FileReader 将 GLB、GLTF、OBJ、STL 转为 dataURL，并写入 importedModelDataUrl、importedModelName、importedModelFormat。</p></div>
+        <div class="card"><h3>导入优先级</h3><p>ModelViewer 检测到 importedModelDataUrl 时优先加载用户资产；移除导入模型后恢复 AI 参数化预览。</p></div>
+        <div class="card"><h3>图片贴图</h3><p>PropertyInspectorPanel 支持上传图片作为 mainTextureDataUrl，并配置重复次数和纹理强度。</p></div>
+        <div class="card"><h3>可视化反馈</h3><p>导入成功后左侧按钮展示文件名；底部视图标签会显示当前是“导入模型资产”还是“AI 参数化模型”。</p></div>
+      </div>
+    </section>
+
+    <section class="section callout">
+      <strong>UI 规范：</strong>
+      <p>项目图标统一使用 lucide-react，顶部 CTA 使用更明显的边框、发光和半透明背景，让 AI 学习手册、AI 文档、GitHub 与联系作者入口更有产品化识别度。</p>
+    </section>
+
+    <footer class="footer">上一页：<a class="action-link" href="./generation-flow.html">AI 生成链路</a> 下一页：<a class="action-link" href="./backend.html">后端实现</a></footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 98%;
+  --foreground: 0 0% 7%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 7%;
+  --primary: 0 0% 7%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 0 0% 94%;
+  --secondary-foreground: 0 0% 12%;
+  --muted: 0 0% 92%;
+  --muted-foreground: 0 0% 40%;
+  --accent: 0 0% 90%;
+  --accent-foreground: 0 0% 8%;
+  --destructive: 0 72% 48%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 86%;
+  --input: 0 0% 86%;
+  --ring: 0 0% 7%;
+  --radius: 0.85rem;
+}
+
+.dark {
+  --background: 0 0% 3%;
+  --foreground: 0 0% 96%;
+  --card: 0 0% 6%;
+  --card-foreground: 0 0% 96%;
+  --primary: 0 0% 96%;
+  --primary-foreground: 0 0% 5%;
+  --secondary: 0 0% 10%;
+  --secondary-foreground: 0 0% 92%;
+  --muted: 0 0% 13%;
+  --muted-foreground: 0 0% 63%;
+  --accent: 0 0% 16%;
+  --accent-foreground: 0 0% 96%;
+  --destructive: 0 70% 45%;
+  --destructive-foreground: 0 0% 96%;
+  --border: 0 0% 16%;
+  --input: 0 0% 18%;
+  --ring: 0 0% 86%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 28rem),
+    linear-gradient(135deg, hsl(var(--background)), #050505 70%);
+  color: hsl(var(--foreground));
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+textarea,
+input,
+select {
+  font: inherit;
+}
+
+::selection {
+  background: hsl(var(--foreground));
+  color: hsl(var(--background));
+}
+
+.mono-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}

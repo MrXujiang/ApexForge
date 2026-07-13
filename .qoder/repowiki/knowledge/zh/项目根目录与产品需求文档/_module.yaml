@@ -1,0 +1,9 @@
+schema_version: 1
+module_path: ""
+title: 项目根目录与产品需求文档
+scope:
+    - LICENSE
+    - prd.md
+source_files: []
+depends_on: []
+related_to: []

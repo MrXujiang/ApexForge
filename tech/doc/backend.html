@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ApexForge 开发者文档 · 后端实现</title>
+  <meta name="description" content="ApexForge NestJS API、LLM 适配、生成服务和 Prisma 数据模型说明。" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="doc-shell">
+    <header class="topbar">
+      <a class="brand" href="./index.html"><span class="brand-mark">AF</span><span>ApexForge Docs</span></a>
+      <nav class="nav-links" aria-label="文档导航">
+        <a href="./index.html">总览</a>
+        <a href="./architecture.html">架构设计</a>
+        <a href="./generation-flow.html">AI 生成链路</a>
+        <a href="./frontend.html">前端实现</a>
+        <a class="active" href="./backend.html">后端实现</a>
+        <a href="./rendering.html">3D 渲染</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">NestJS API</div>
+        <h1>AI 建模后端的服务化实现</h1>
+        <p class="lead">后端承担生成任务编排、LLM 调用、Harness 多 Agent 输出、模板管理、资产记录、反馈收集和质量评分等职责。它把不稳定的自然语言输入转化为前端可以稳定消费的结构化建模参数。</p>
+      </div>
+      <aside class="panel">
+        <h3>后端关键文件</h3>
+        <div class="tag-row">
+          <span class="tag">generation.service.ts</span>
+          <span class="tag">generation-harness.service.ts</span>
+          <span class="tag">llm.service.ts</span>
+          <span class="tag">validation.service.ts</span>
+          <span class="tag">templates.service.ts</span>
+          <span class="tag">schema.prisma</span>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section">
+      <h2>API 模块地图</h2>
+      <div class="card-grid">
+        <div class="card"><h3>GenerationModule</h3><p>核心生成模块，提供 /api/v1/generations 创建生成任务、查询历史和获取生成详情。</p></div>
+        <div class="card"><h3>LlmModule</h3><p>封装模型供应商配置、OpenAI-compatible 请求体、系统 Prompt、API Key 优先级和 JSON 解析。</p></div>
+        <div class="card"><h3>ValidationModule</h3><p>对生成结果进行基础质量判断，为前端展示质量报告和后续优化提供依据。</p></div>
+        <div class="card"><h3>TemplatesModule</h3><p>管理模板库和 seed 数据，为用户提供可快速开始的建模场景。</p></div>
+        <div class="card"><h3>AssetsModule</h3><p>记录模型资产与相关元数据，为导入、版本和资产库扩展打基础。</p></div>
+        <div class="card"><h3>FeedbackModule</h3><p>收集用户反馈与评分，形成模型质量迭代闭环。</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>后端请求链路</h2>
+      <div class="diagram">
+        <div class="flow-row" aria-label="后端请求链路图">
+          <div class="flow-node"><div class="node-title">Controller</div><p>接收 DTO，统一 API 路由</p></div>
+          <div class="flow-node"><div class="node-title">GenerationService</div><p>推断品类并创建任务</p></div>
+          <div class="flow-node"><div class="node-title">LlmService</div><p>调用 DeepSeek / Kimi / Qwen</p></div>
+          <div class="flow-node"><div class="node-title">Harness</div><p>生成 Agent 与技能链说明</p></div>
+          <div class="flow-node"><div class="node-title">Prisma</div><p>保存任务、评分和资产</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section two-col">
+      <div class="panel">
+        <h2>CreateGenerationDto</h2>
+        <p>生成请求包含 prompt、category、provider 和 llmApiKeys。llmApiKeys 是在线模型配置能力的关键字段，允许前端在不修改 .env 的情况下传递当前浏览器的供应商 Key。</p>
+      </div>
+      <div class="code-card">
+        <pre><code>{
+  "prompt": "生成一个复古便携式收音机",
+  "category": "product",
+  "provider": "deepseek",
+  "llmApiKeys": {
+    "deepseek": "在线填写的 Key",
+    "kimi": "",
+    "qwen": ""
+  }
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>LLM 适配策略</h2>
+      <div class="timeline">
+        <div class="timeline-item"><h3>统一供应商标识</h3><p>normalizeProvider 将前端传入值归一化为 deepseek、kimi、qwen 等内部供应商标识。</p></div>
+        <div class="timeline-item"><h3>解析 Provider Config</h3><p>resolveProviderConfig 根据供应商获取 baseURL、模型名、环境变量名和展示名称。</p></div>
+        <div class="timeline-item"><h3>API Key 优先级</h3><p>先使用 apiKeyOverride，也就是用户在线填写的 Key；如果没有，才读取服务端环境变量。</p></div>
+        <div class="timeline-item"><h3>OpenAI-compatible 请求</h3><p>后端向 /chat/completions 发送 messages、temperature 和 response_format json_object，要求模型返回结构化 JSON。</p></div>
+        <div class="timeline-item"><h3>错误信息产品化</h3><p>缺少 Key 时给出可操作提示：在左侧在线配置填写，或在项目环境变量中设置对应变量名。</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Prisma 数据模型</h2>
+      <table class="table">
+        <tr><th>模型</th><th>用途</th><th>扩展价值</th></tr>
+        <tr><td>Template</td><td>保存模板名称、品类、提示词和默认参数</td><td>支持模板市场和官方示例库</td></tr>
+        <tr><td>GenerationTask</td><td>记录一次生成任务的 prompt、category、status、result</td><td>支持历史、复现、任务队列</td></tr>
+        <tr><td>ValidationReport</td><td>保存生成结果的验证说明</td><td>支持质量审计和自动修复建议</td></tr>
+        <tr><td>QualityScore</td><td>记录几何、材质、提示词匹配等评分</td><td>支持排序、推荐和 A/B 测试</td></tr>
+        <tr><td>ModelAsset</td><td>记录模型资产信息</td><td>支持资产库、下载、版本管理</td></tr>
+        <tr><td>ModelVersion</td><td>保存资产不同版本</td><td>支持迭代对比和回滚</td></tr>
+        <tr><td>Feedback</td><td>保存用户反馈</td><td>支持产品闭环和训练数据沉淀</td></tr>
+      </table>
+    </section>
+
+    <section class="section callout">
+      <strong>后端开发建议：</strong>
+      <p>新增模型供应商时优先扩展 provider config 和 normalizeProvider；新增生成参数时同步更新 DTO、共享类型、LLM 系统 Prompt、前端属性面板和 modelFactory 消费逻辑。</p>
+    </section>
+
+    <footer class="footer">上一页：<a class="action-link" href="./frontend.html">前端实现</a> 下一页：<a class="action-link" href="./rendering.html">3D 渲染</a></footer>
+  </main>
+</body>
+</html>

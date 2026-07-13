@@ -1,0 +1,8 @@
+schema_version: 1
+module_path: logging_system
+title: 日志系统 — 基于 Pino + OpenTelemetry 的可观测性设计
+scope: []
+source_files:
+    - tech/product-technical-design.md
+depends_on: []
+related_to: []

@@ -1,0 +1,63 @@
+# 知识卡导出索引文件
+schema_version: 1
+locale: zh-CN
+branch: main
+nodes_managed: true
+exported_at: "2026-07-08T05:30:33Z"
+modules:
+    "":
+        dir_name: 项目根目录与产品需求文档
+        title: 项目根目录与产品需求文档
+        scope:
+            - LICENSE
+            - prd.md
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    build_system:
+        dir_name: 构建系统：无工程化脚本的纯需求文档仓库
+        title: 构建系统：无工程化脚本的纯需求文档仓库
+        scope: []
+        source_files:
+            - LICENSE
+            - prd.md
+            - tech/optimized-prd.md
+            - tech/product-technical-design.md
+        children: []
+        depends_on: []
+        related_to: []
+    configuration_system:
+        dir_name: 配置系统：仓库仅含需求文档，无实现代码
+        title: 配置系统：仓库仅含需求文档，无实现代码
+        scope: []
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    dependency_management:
+        dir_name: 依赖管理 — 仓库现状与适用性说明
+        title: 依赖管理 — 仓库现状与适用性说明
+        scope: []
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    error_handling:
+        dir_name: 错误处理体系设计（文档规范）
+        title: 错误处理体系设计（文档规范）
+        scope: []
+        source_files:
+            - tech/product-technical-design.md
+        children: []
+        depends_on: []
+        related_to: []
+    logging_system:
+        dir_name: 日志系统 — 基于 Pino + OpenTelemetry 的可观测性设计
+        title: 日志系统 — 基于 Pino + OpenTelemetry 的可观测性设计
+        scope: []
+        source_files:
+            - tech/product-technical-design.md
+        children: []
+        depends_on: []
+        related_to: []

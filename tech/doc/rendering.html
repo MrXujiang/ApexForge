@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ApexForge 开发者文档 · 3D 渲染</title>
+  <meta name="description" content="ApexForge Three.js 渲染器、参数化模型工厂、导入模型和材质系统说明。" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="doc-shell">
+    <header class="topbar">
+      <a class="brand" href="./index.html"><span class="brand-mark">AF</span><span>ApexForge Docs</span></a>
+      <nav class="nav-links" aria-label="文档导航">
+        <a href="./index.html">总览</a>
+        <a href="./architecture.html">架构设计</a>
+        <a href="./generation-flow.html">AI 生成链路</a>
+        <a href="./frontend.html">前端实现</a>
+        <a href="./backend.html">后端实现</a>
+        <a class="active" href="./rendering.html">3D 渲染</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Three.js Rendering</div>
+        <h1>参数化模型、导入资产与真实感材质</h1>
+        <p class="lead">渲染层是 ApexForge 的可视化核心。它通过 Three.js 场景、物理材质、参数化几何体、导入模型加载器和模型归一化工具，把 AI 生成参数转化为可交互的 3D 预览。</p>
+      </div>
+      <aside class="hero-card">
+        <div class="hero-visual" aria-label="Three.js 渲染示意图">
+          <div class="model-handle"></div>
+          <div class="radio-model"></div>
+          <div class="grid-floor"></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section">
+      <h2>渲染层架构图</h2>
+      <div class="diagram">
+        <div class="arch-row" aria-label="渲染层架构图">
+          <div class="arch-col"><div class="node-title">ModelGenerationParams</div><p>颜色、材质、复杂度、贴图、导入资产等参数</p></div>
+          <div class="arch-col"><div class="node-title">ModelViewer</div><p>初始化 Renderer、Scene、Camera、Lights、Controls</p></div>
+          <div class="arch-col"><div class="node-title">modelFactory</div><p>按品类生成参数化 Mesh Group</p></div>
+          <div class="arch-col"><div class="node-title">modelNormalizer</div><p>居中 XZ，底部贴地到 Y=0</p></div>
+          <div class="arch-col"><div class="node-title">Canvas Preview</div><p>阴影、地面网格、轨道控制和视图标签</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>ModelViewer 生命周期</h2>
+      <div class="timeline">
+        <div class="timeline-item"><h3>创建场景</h3><p>设置 WebGLRenderer、ACESFilmicToneMapping、PCFSoftShadowMap、PerspectiveCamera、环境光和主光源。</p></div>
+        <div class="timeline-item"><h3>选择模型来源</h3><p>如果存在 importedModelDataUrl，则调用 loadImportedModel；否则调用 createModelFromParams 生成 AI 参数化模型。</p></div>
+        <div class="timeline-item"><h3>归一化与落地</h3><p>normalizeModel 只在 XZ 方向居中，并将 group.position.y 减去 box.min.y，让模型底部贴地，避免网格穿过模型中心。</p></div>
+        <div class="timeline-item"><h3>渲染循环</h3><p>OrbitControls 支持用户旋转、缩放、观察模型；窗口变化时同步更新相机和渲染器尺寸。</p></div>
+        <div class="timeline-item"><h3>清理资源</h3><p>组件卸载或参数变化时移除旧模型，避免异步导入旧资源覆盖新状态。</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>参数化模型工厂</h2>
+      <div class="feature-grid">
+        <div class="card"><h3>基础几何</h3><p>封装 box、cylinder、sphere、torus 等几何体；圆角盒体通过 Shape 和 ExtrudeGeometry 生成更柔和的硬表面外观。</p></div>
+        <div class="card"><h3>材质系统</h3><p>createMaterial 使用 MeshPhysicalMaterial，根据 brushed-metal、anodized-metal、ceramic、glass 等预设控制 metalness、roughness、clearcoat 和透明度。</p></div>
+        <div class="card"><h3>品类分支</h3><p>针对 vehicle、watch、jewelry、architecture、aircraft、furniture、mirror、plane、headphone、camera、shoe、bag、appliance、vessel、character、panel、radio 等建立专属模型结构。</p></div>
+        <div class="card"><h3>默认收音机</h3><p>product 默认和 radio 关键词会进入 createRadioProductModel，生成圆角机身、扬声器格栅、频段显示窗、双旋钮、顶部提手、底座和脚垫。</p></div>
+        <div class="card"><h3>连接白名单</h3><p>为了减少无意义圆柱，连接网络只在 vehicle、aircraft、furniture 等需要结构杆件的品类中启用。</p></div>
+        <div class="card"><h3>贴图支持</h3><p>mainTextureDataUrl 可被 TextureLoader 加载，结合 RepeatWrapping、textureRepeatX、textureRepeatY 和 textureStrength 应用于材质。</p></div>
+      </div>
+    </section>
+
+    <section class="section two-col">
+      <div class="panel">
+        <h2>导入模型加载器</h2>
+        <p>导入能力覆盖 Three.js 常见格式：GLB、GLTF 使用 GLTFLoader，OBJ 使用 OBJLoader，STL 使用 STLLoader 并补充默认物理材质。所有导入 Mesh 都启用 castShadow 和 receiveShadow，保持与参数化模型一致的光照效果。</p>
+      </div>
+      <table class="table">
+        <tr><th>格式</th><th>加载方式</th><th>说明</th></tr>
+        <tr><td>GLB</td><td>GLTFLoader.loadAsync(dataUrl)</td><td>二进制 glTF，推荐用于完整材质与层级模型。</td></tr>
+        <tr><td>GLTF</td><td>GLTFLoader.loadAsync(dataUrl)</td><td>JSON glTF，适合调试和可读结构。</td></tr>
+        <tr><td>OBJ</td><td>OBJLoader.parse(text)</td><td>读取 dataURL 后转文本解析，通常需要额外材质文件时可扩展。</td></tr>
+        <tr><td>STL</td><td>STLLoader.parse(arrayBuffer)</td><td>常用于 CAD 或打印模型，加载后补默认材质。</td></tr>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>关键优化说明</h2>
+      <div class="card-grid">
+        <div class="card"><h3>坐标系移动到底部</h3><p>早期 normalizeModel 直接用 group.position.sub(center)，会让网格穿过模型中心。现在只在 XZ 居中，Y 方向按包围盒最小值贴地。</p></div>
+        <div class="card"><h3>减少圆柱噪声</h3><p>原来的连续性增强会对所有品类追加连接圆柱，导致普通产品出现无意义杆件。现在使用品类白名单控制。</p></div>
+        <div class="card"><h3>提升默认观感</h3><p>默认收音机模型加入完整机身层次、格栅、显示窗、旋钮、提手和脚垫，比早期通用产品盒体更符合产品展示。</p></div>
+      </div>
+    </section>
+
+    <section class="section callout">
+      <strong>渲染扩展建议：</strong>
+      <p>如果后续要提升真实感，可继续加入 HDR 环境贴图、后处理 Bloom、模型压缩 Draco、导入材质贴图解析、零件选择和可编辑控制点。</p>
+    </section>
+
+    <footer class="footer">上一页：<a class="action-link" href="./backend.html">后端实现</a> 返回：<a class="action-link" href="./index.html">项目总览</a></footer>
+  </main>
+</body>
+</html>

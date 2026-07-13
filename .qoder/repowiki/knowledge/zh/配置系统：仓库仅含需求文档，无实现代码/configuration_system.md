@@ -1,0 +1,1 @@
+经全面检索（grep 搜索 config、yaml、toml、env、json、ini、properties 等关键词，以及 *.py / *.go / *.js 等源码文件），该仓库根目录与 tech/ 下仅包含产品技术需求文档（product-technical-design.md、optimized-prd.md）、PRD 与 GPLv3 许可证文本，不存在任何应用程序源代码、构建脚本或配置文件。因此本仓库未实现任何配置加载、分层或管理逻辑，configuration_system 类别在此不适用。

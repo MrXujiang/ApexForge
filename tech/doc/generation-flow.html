@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ApexForge 开发者文档 · AI 生成链路</title>
+  <meta name="description" content="ApexForge 从 Prompt 到参数化 3D 模型的 AI 生成链路。" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="doc-shell">
+    <header class="topbar">
+      <a class="brand" href="./index.html"><span class="brand-mark">AF</span><span>ApexForge Docs</span></a>
+      <nav class="nav-links" aria-label="文档导航">
+        <a href="./index.html">总览</a>
+        <a href="./architecture.html">架构设计</a>
+        <a class="active" href="./generation-flow.html">AI 生成链路</a>
+        <a href="./frontend.html">前端实现</a>
+        <a href="./backend.html">后端实现</a>
+        <a href="./rendering.html">3D 渲染</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Generation Pipeline</div>
+        <h1>Prompt 如何变成可渲染的 3D 模型</h1>
+        <p class="lead">ApexForge 的生成链路采用“用户意图 → 结构化参数 → Harness 多 Agent → Three.js 参数化模型”的方式。LLM 不直接输出 Three.js 代码，而是输出稳定的建模参数，再交给前端模型工厂渲染。</p>
+      </div>
+      <aside class="panel">
+        <h3>链路关键词</h3>
+        <div class="tag-row">
+          <span class="tag">ModelGenerationParams</span>
+          <span class="tag">response_format json_object</span>
+          <span class="tag">temperature 0.68</span>
+          <span class="tag">Harness Agents</span>
+          <span class="tag">Quality Score</span>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section">
+      <h2>端到端生成流程图</h2>
+      <div class="diagram">
+        <div class="flow-row" aria-label="AI 生成流程图">
+          <div class="flow-node"><div class="node-title">1. 用户输入</div><p>描述模型、风格、颜色、材质、细节</p></div>
+          <div class="flow-node"><div class="node-title">2. 前端请求</div><p>携带 category、provider、在线 Key、当前参数</p></div>
+          <div class="flow-node"><div class="node-title">3. LLM 意图解析</div><p>输出 JSON 参数和品类语义</p></div>
+          <div class="flow-node"><div class="node-title">4. Harness 编排</div><p>多 Agent 补充结构、材质、质检建议</p></div>
+          <div class="flow-node"><div class="node-title">5. 3D 渲染</div><p>ModelViewer 加载参数化模型或导入资产</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section two-col">
+      <div class="panel">
+        <h2>为什么使用参数协议</h2>
+        <p>直接让大模型生成 Three.js 代码不可控、难验证且安全风险更高。ApexForge 将 AI 输出约束为 ModelGenerationParams，前端只消费白名单字段，并由 modelFactory 生成稳定几何体。这种方式更适合 MVP、在线演示和后续工程化扩展。</p>
+      </div>
+      <div class="code-card">
+        <pre><code>{
+  "category": "product",
+  "bodyColor": "#d4a05f",
+  "accentColor": "#2f2f36",
+  "materialPreset": "brushed-metal",
+  "detailLevel": 8,
+  "complexity": 7,
+  "silhouette": "复古便携式收音机",
+  "edgeStyle": "rounded",
+  "curveIntensity": 0.72,
+  "connectorDensity": 2
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Harness 多 Agent 协作</h2>
+      <div class="card-grid">
+        <div class="card"><h3>Prompt Architect</h3><p>分析用户描述，补齐商业级 CAD 约束，锁定建模目标，避免 Prompt 过短造成品类偏移。</p></div>
+        <div class="card"><h3>Structure Agent</h3><p>关注主体比例、结构分件、连接关系和可识别轮廓，确保模型不是简单盒子或随机组件。</p></div>
+        <div class="card"><h3>Surface Detail Agent</h3><p>补充接缝、格栅、面板、旋钮、纹理区域等可视化细节，提高模型可信度。</p></div>
+        <div class="card"><h3>Material Agent</h3><p>根据品类选择金属、陶瓷、玻璃、哑光塑料等材质预设，并形成主体与强调色分层。</p></div>
+        <div class="card"><h3>Quality Agent</h3><p>给出质量评分与检查结论，辅助前端展示生成可信度和后续优化方向。</p></div>
+        <div class="card"><h3>Skill Chain</h3><p>串联轮廓粗模、硬表面分件、倒角可读性、材质分层和渲染质检。</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>多供应商与在线 API Key</h2>
+      <div class="timeline">
+        <div class="timeline-item"><h3>前端选择供应商</h3><p>用户在 PromptInput 中选择 DeepSeek、Kimi 或千问，并可直接输入对应 API Key。</p></div>
+        <div class="timeline-item"><h3>浏览器本地保存</h3><p>API Key 保存到当前浏览器 localStorage，避免要求用户修改项目 .env。</p></div>
+        <div class="timeline-item"><h3>生成时随请求传递</h3><p>createLocalGeneration 将 llmApiKeys 作为请求体字段发给后端。</p></div>
+        <div class="timeline-item"><h3>后端优先使用在线 Key</h3><p>LlmService 先读取 apiKeyOverride，未填写时才回退服务端环境变量。</p></div>
+        <div class="timeline-item"><h3>缺失时给出明确提示</h3><p>如果在线 Key 和环境变量都不存在，后端返回“请在左侧在线模型配置中填写，或在 .env 中设置变量名”的错误。</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>品类识别与直连关键词</h2>
+      <div class="feature-grid">
+        <div class="card"><h3>开放品类</h3><p>生成服务通过 prompt 和 category 推断模型类型，覆盖汽车、手表、首饰、建筑、飞机、家具、镜子、耳机、相机、鞋、包、小家电、容器、机器人、面板设备、收音机等。</p></div>
+        <div class="card"><h3>直连关键词</h3><p>对明确品类词进行快速识别，例如“收音机、radio、portable radio、镜子、飞机”等，避免所有未知输入都落入单一默认模型。</p></div>
+        <div class="card"><h3>默认策略</h3><p>如果用户没有明确品类，product 默认会生成高质量复古收音机，确保首页初始模型足够美观。</p></div>
+        <div class="card"><h3>前后端同步</h3><p>前端本地生成和后端 GenerationService 维护一致的关键词策略，保证断网回退与在线生成体验一致。</p></div>
+      </div>
+    </section>
+
+    <section class="section callout">
+      <strong>关键设计取舍：</strong>
+      <p>LLM 负责理解和规划，Three.js 工厂负责可控渲染。这样既能利用大模型的语义理解，也能避免不可预测代码执行，让模型生成更稳定、更安全、更容易调试。</p>
+    </section>
+
+    <footer class="footer">上一页：<a class="action-link" href="./architecture.html">架构设计</a> 下一页：<a class="action-link" href="./frontend.html">前端实现</a></footer>
+  </main>
+</body>
+</html>

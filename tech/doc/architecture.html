@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ApexForge 开发者文档 · 架构设计</title>
+  <meta name="description" content="ApexForge 系统架构、模块分层、数据模型和部署关系说明。" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="doc-shell">
+    <header class="topbar">
+      <a class="brand" href="./index.html"><span class="brand-mark">AF</span><span>ApexForge Docs</span></a>
+      <nav class="nav-links" aria-label="文档导航">
+        <a href="./index.html">总览</a>
+        <a class="active" href="./architecture.html">架构设计</a>
+        <a href="./generation-flow.html">AI 生成链路</a>
+        <a href="./frontend.html">前端实现</a>
+        <a href="./backend.html">后端实现</a>
+        <a href="./rendering.html">3D 渲染</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Architecture Blueprint</div>
+        <h1>从用户输入到 3D 模型的全栈架构</h1>
+        <p class="lead">ApexForge 采用前后端分层设计：前端负责 Studio 交互、参数编辑和 Three.js 可视化，后端负责 AI 意图解析、Harness 编排、数据持久化和质量校验，数据库记录模板、任务、资产、版本与反馈。</p>
+      </div>
+      <aside class="panel">
+        <h3>关键源码入口</h3>
+        <div class="tag-row">
+          <span class="tag">src/modules/studio</span>
+          <span class="tag">src/modules/viewer</span>
+          <span class="tag">apps/api/src/modules/generation</span>
+          <span class="tag">apps/api/src/modules/llm</span>
+          <span class="tag">prisma/schema.prisma</span>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section">
+      <h2>系统总架构图</h2>
+      <div class="diagram">
+        <div class="arch-row" aria-label="ApexForge 系统架构图">
+          <div class="arch-col">
+            <div class="node-title">浏览器 Studio</div>
+            <ul class="node-list">
+              <li>Prompt 输入</li>
+              <li>在线 API Key</li>
+              <li>属性编辑</li>
+              <li>模型导入</li>
+            </ul>
+          </div>
+          <div class="arch-col">
+            <div class="node-title">React 前端</div>
+            <ul class="node-list">
+              <li>StudioPage 状态中枢</li>
+              <li>GenerationService API</li>
+              <li>ModelViewer 渲染</li>
+              <li>modelFactory 建模</li>
+            </ul>
+          </div>
+          <div class="arch-col">
+            <div class="node-title">NestJS API</div>
+            <ul class="node-list">
+              <li>GenerationController</li>
+              <li>GenerationService</li>
+              <li>HarnessService</li>
+              <li>LlmService</li>
+            </ul>
+          </div>
+          <div class="arch-col">
+            <div class="node-title">AI 供应商</div>
+            <ul class="node-list">
+              <li>DeepSeek</li>
+              <li>Kimi</li>
+              <li>Qwen</li>
+              <li>OpenAI-compatible</li>
+            </ul>
+          </div>
+          <div class="arch-col">
+            <div class="node-title">Prisma / SQLite</div>
+            <ul class="node-list">
+              <li>模板</li>
+              <li>生成任务</li>
+              <li>模型资产</li>
+              <li>反馈与评分</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section stack-map">
+      <div class="stack-node">
+        <h2>前端分层</h2>
+        <table class="table">
+          <tr><th>层级</th><th>职责</th></tr>
+          <tr><td>页面层</td><td>StudioPage 组合左中右三栏、顶部导航、历史、生成状态、在线 Key、联系作者弹窗。</td></tr>
+          <tr><td>输入层</td><td>PromptInput 管理自然语言输入、模型供应商、在线 API Key 和本地 3D 文件导入。</td></tr>
+          <tr><td>编辑层</td><td>PropertyInspectorPanel 修改颜色、材质、复杂度、曲线强度、贴图等生成参数。</td></tr>
+          <tr><td>渲染层</td><td>ModelViewer 构建 Three.js 场景，调用模型工厂或导入模型加载器。</td></tr>
+        </table>
+      </div>
+      <div class="stack-node">
+        <h2>后端分层</h2>
+        <table class="table">
+          <tr><th>层级</th><th>职责</th></tr>
+          <tr><td>Controller</td><td>暴露 /api/v1/generations、/templates、/feedback、/assets 等接口。</td></tr>
+          <tr><td>Application Service</td><td>GenerationService 编排任务创建、类别推断、LLM 调用和结果组装。</td></tr>
+          <tr><td>AI Adapter</td><td>LlmService 统一 DeepSeek、Kimi、Qwen 的 OpenAI-compatible 调用协议。</td></tr>
+          <tr><td>Persistence</td><td>PrismaService 操作 SQLite，保存模板、任务、资产、版本、反馈与质量评分。</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>核心模块关系</h2>
+      <div class="feature-grid">
+        <div class="card"><h3>StudioPage</h3><p>页面级状态中枢，负责把 PromptInput、ModelViewer、PropertyInspectorPanel、AgentOrchestrationPanel、GenerationPanel 与 HistoryList 连接起来。</p></div>
+        <div class="card"><h3>generationService</h3><p>前端 API 门面，优先请求后端生成；当网络不可达时，可按约束回退到本地生成逻辑。</p></div>
+        <div class="card"><h3>GenerationService</h3><p>后端生成用例入口：推断品类、识别直连关键词、调用 LLM、执行 Harness、保存任务并返回结构化结果。</p></div>
+        <div class="card"><h3>LlmService</h3><p>封装多供应商 baseURL、模型名、API Key 选择、系统 Prompt、JSON 解析和错误提示。</p></div>
+        <div class="card"><h3>ModelViewer</h3><p>浏览器侧 Three.js 渲染器，管理场景生命周期、导入模型加载、相机控制、阴影和视图标签。</p></div>
+        <div class="card"><h3>modelFactory</h3><p>参数化模型工厂，根据 category、silhouette、材质、曲线、连接密度创建可视化模型。</p></div>
+      </div>
+    </section>
+
+    <section class="section two-col">
+      <div class="panel">
+        <h2>数据模型视角</h2>
+        <p>Prisma schema 将平台数据拆成模板、生成任务、验证报告、质量评分、模型资产、模型版本和用户反馈。这样既能支持当前演示，也为后续版本管理、资产库、用户评价和质量追踪留出扩展点。</p>
+      </div>
+      <div class="diagram">
+        <div class="arch-row" aria-label="数据模型关系图">
+          <div class="arch-col"><div class="node-title">Template</div><p>预设品类与提示词样板</p></div>
+          <div class="arch-col"><div class="node-title">GenerationTask</div><p>一次 AI 建模任务</p></div>
+          <div class="arch-col"><div class="node-title">ModelAsset</div><p>导入或生成的模型资产</p></div>
+          <div class="arch-col"><div class="node-title">ModelVersion</div><p>资产版本与迭代记录</p></div>
+          <div class="arch-col"><div class="node-title">Feedback</div><p>用户评价与改进信号</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section callout">
+      <strong>架构原则：</strong>
+      <p>前端保留高频交互和可视化能力，后端集中处理 AI、数据和质量闭环；模型密钥优先使用用户在线配置，避免把真实密钥固化到源码或文档中。</p>
+    </section>
+
+    <footer class="footer">上一页：<a class="action-link" href="./index.html">项目总览</a> 下一页：<a class="action-link" href="./generation-flow.html">AI 生成链路</a></footer>
+  </main>
+</body>
+</html>

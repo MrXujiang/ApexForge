@@ -1,0 +1,7 @@
+schema_version: 1
+module_path: configuration_system
+title: 配置系统：仓库仅含需求文档，无实现代码
+scope: []
+source_files: []
+depends_on: []
+related_to: []
