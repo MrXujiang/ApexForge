@@ -1,0 +1,14 @@
+schema_version: 1
+module_path: frontend_style
+title: 前端样式体系：shadcn/ui + Tailwind CSS + HSL 设计令牌
+scope: []
+source_files:
+    - tailwind.config.js
+    - postcss.config.js
+    - components.json
+    - src/shared/styles/globals.css
+    - src/shared/styles/theme.ts
+    - src/shared/components/Button.tsx
+    - src/shared/components/Card.tsx
+depends_on: []
+related_to: []

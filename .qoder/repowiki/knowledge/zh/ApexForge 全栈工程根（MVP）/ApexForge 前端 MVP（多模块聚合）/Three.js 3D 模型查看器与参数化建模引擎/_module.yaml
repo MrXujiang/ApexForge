@@ -1,0 +1,8 @@
+schema_version: 1
+module_path: web_frontend/viewer
+title: Three.js 3D 模型查看器与参数化建模引擎
+scope:
+    - src/modules/viewer/
+source_files: []
+depends_on: []
+related_to: []

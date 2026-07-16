@@ -1,0 +1,8 @@
+schema_version: 1
+module_path: api_server/templates_module
+title: 模板目录与种子数据服务
+scope:
+    - apps/api/src/modules/templates/
+source_files: []
+depends_on: []
+related_to: []

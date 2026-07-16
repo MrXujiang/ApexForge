@@ -1,0 +1,11 @@
+schema_version: 1
+module_path: api_server/common_and_infra
+title: API 应用启动与基础设施层
+scope:
+    - apps/api/src/common/
+    - apps/api/src/prisma/
+    - apps/api/src/app.module.ts
+    - apps/api/src/main.ts
+source_files: []
+depends_on: []
+related_to: []

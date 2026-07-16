@@ -1,0 +1,8 @@
+schema_version: 1
+module_path: api_server/generation_module
+title: 3D 模型生成编排模块
+scope:
+    - apps/api/src/modules/generation/
+source_files: []
+depends_on: []
+related_to: []

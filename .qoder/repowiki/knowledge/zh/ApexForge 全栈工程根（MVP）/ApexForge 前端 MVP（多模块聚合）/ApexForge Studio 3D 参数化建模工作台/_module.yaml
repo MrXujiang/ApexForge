@@ -1,0 +1,8 @@
+schema_version: 1
+module_path: web_frontend/studio
+title: ApexForge Studio 3D 参数化建模工作台
+scope:
+    - src/modules/studio/
+source_files: []
+depends_on: []
+related_to: []

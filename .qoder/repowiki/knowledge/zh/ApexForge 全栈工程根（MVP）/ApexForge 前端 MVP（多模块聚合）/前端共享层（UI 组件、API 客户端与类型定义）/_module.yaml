@@ -1,0 +1,8 @@
+schema_version: 1
+module_path: web_frontend/shared
+title: 前端共享层（UI 组件、API 客户端与类型定义）
+scope:
+    - src/shared/
+source_files: []
+depends_on: []
+related_to: []

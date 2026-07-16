@@ -3,14 +3,99 @@ schema_version: 1
 locale: zh-CN
 branch: main
 nodes_managed: true
-exported_at: "2026-07-08T05:30:33Z"
+exported_at: "2026-07-13T04:32:47Z"
 modules:
     "":
-        dir_name: 项目根目录与产品需求文档
-        title: 项目根目录与产品需求文档
+        dir_name: ApexForge 全栈工程根（MVP）
+        title: ApexForge 全栈工程根（MVP）
         scope:
-            - LICENSE
-            - prd.md
+            - README.md
+            - .gitignore
+            - components.json
+            - nest-cli.json
+            - postcss.config.js
+            - tailwind.config.js
+            - tsconfig.json
+            - tsconfig.node.json
+            - vite.config.ts
+            - package.json
+            - package-lock.json
+        source_files: []
+        children:
+            - api_server
+            - tech_docs
+            - web_frontend
+        depends_on: []
+        related_to: []
+    api_server:
+        dir_name: ApexForge API 服务（NestJS 后端）
+        title: ApexForge API 服务（NestJS 后端）
+        scope:
+            - apps/api/
+        source_files: []
+        children:
+            - api_server/assets_module
+            - api_server/common_and_infra
+            - api_server/feedback_module
+            - api_server/generation_module
+            - api_server/llm_module
+            - api_server/templates_module
+        depends_on: []
+        related_to: []
+    api_server/assets_module:
+        dir_name: 模型资产（Model Asset）管理模块
+        title: 模型资产（Model Asset）管理模块
+        scope:
+            - apps/api/src/modules/assets/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    api_server/common_and_infra:
+        dir_name: API 应用启动与基础设施层
+        title: API 应用启动与基础设施层
+        scope:
+            - apps/api/src/common/
+            - apps/api/src/prisma/
+            - apps/api/src/app.module.ts
+            - apps/api/src/main.ts
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    api_server/feedback_module:
+        dir_name: 反馈提交模块（Feedback）
+        title: 反馈提交模块（Feedback）
+        scope:
+            - apps/api/src/modules/feedback/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    api_server/generation_module:
+        dir_name: 3D 模型生成编排模块
+        title: 3D 模型生成编排模块
+        scope:
+            - apps/api/src/modules/generation/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    api_server/llm_module:
+        dir_name: LLM 意图生成与输入校验服务
+        title: LLM 意图生成与输入校验服务
+        scope:
+            - apps/api/src/modules/llm/
+            - apps/api/src/modules/validation/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    api_server/templates_module:
+        dir_name: 模板目录与种子数据服务
+        title: 模板目录与种子数据服务
+        scope:
+            - apps/api/src/modules/templates/
         source_files: []
         children: []
         depends_on: []
@@ -52,12 +137,77 @@ modules:
         children: []
         depends_on: []
         related_to: []
+    frontend_style:
+        dir_name: 前端样式体系：shadcn_ui + Tailwind CSS + HSL 设计令牌
+        title: 前端样式体系：shadcn/ui + Tailwind CSS + HSL 设计令牌
+        scope: []
+        source_files:
+            - tailwind.config.js
+            - postcss.config.js
+            - components.json
+            - src/shared/styles/globals.css
+            - src/shared/styles/theme.ts
+            - src/shared/components/Button.tsx
+            - src/shared/components/Card.tsx
+        children: []
+        depends_on: []
+        related_to: []
     logging_system:
         dir_name: 日志系统 — 基于 Pino + OpenTelemetry 的可观测性设计
         title: 日志系统 — 基于 Pino + OpenTelemetry 的可观测性设计
         scope: []
         source_files:
             - tech/product-technical-design.md
+        children: []
+        depends_on: []
+        related_to: []
+    tech_docs:
+        dir_name: ApexForge 产品与技术设计文档
+        title: ApexForge 产品与技术设计文档
+        scope:
+            - tech/
+            - prd.md
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    web_frontend:
+        dir_name: ApexForge 前端 MVP（多模块聚合）
+        title: ApexForge 前端 MVP（多模块聚合）
+        scope:
+            - src/modules/
+            - src/shared/
+        source_files: []
+        children:
+            - web_frontend/shared
+            - web_frontend/studio
+            - web_frontend/viewer
+        depends_on: []
+        related_to: []
+    web_frontend/shared:
+        dir_name: 前端共享层（UI 组件、API 客户端与类型定义）
+        title: 前端共享层（UI 组件、API 客户端与类型定义）
+        scope:
+            - src/shared/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    web_frontend/studio:
+        dir_name: ApexForge Studio 3D 参数化建模工作台
+        title: ApexForge Studio 3D 参数化建模工作台
+        scope:
+            - src/modules/studio/
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
+    web_frontend/viewer:
+        dir_name: Three.js 3D 模型查看器与参数化建模引擎
+        title: Three.js 3D 模型查看器与参数化建模引擎
+        scope:
+            - src/modules/viewer/
+        source_files: []
         children: []
         depends_on: []
         related_to: []

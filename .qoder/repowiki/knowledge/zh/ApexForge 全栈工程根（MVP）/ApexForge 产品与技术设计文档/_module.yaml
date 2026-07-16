@@ -1,0 +1,9 @@
+schema_version: 1
+module_path: tech_docs
+title: ApexForge 产品与技术设计文档
+scope:
+    - tech/
+    - prd.md
+source_files: []
+depends_on: []
+related_to: []

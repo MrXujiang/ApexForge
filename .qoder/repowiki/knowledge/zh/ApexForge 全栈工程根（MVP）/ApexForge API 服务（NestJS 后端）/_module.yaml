@@ -1,0 +1,8 @@
+schema_version: 1
+module_path: api_server
+title: ApexForge API 服务（NestJS 后端）
+scope:
+    - apps/api/
+source_files: []
+depends_on: []
+related_to: []

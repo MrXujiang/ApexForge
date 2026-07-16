@@ -1,0 +1,8 @@
+schema_version: 1
+module_path: api_server/feedback_module
+title: 反馈提交模块（Feedback）
+scope:
+    - apps/api/src/modules/feedback/
+source_files: []
+depends_on: []
+related_to: []
